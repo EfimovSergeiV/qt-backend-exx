@@ -12,8 +12,8 @@ map_devices = {
     "device0": ["01", "01", "77"], # Устройство 1
     "device1": ["01", "02", "77"], # Устройство 2
     "device2": ["01", "04", "77"], # Устройство 3
-    "device3": ["01", "07", "77"], # Устройство 4
-    "device4": ["01", "08", "77"], # Устройство 5
+    "device3": ["01", "07", "01"], # Устройство 4
+    "device4": ["01", "0e", "77"], # Устройство 5
 }
 
 
@@ -73,6 +73,7 @@ class Controller(QObject):
         # Отображаем данные по каждому устройству:
         # if bytes[0] == map_devices["device0"][0] and bytes[1] == map_devices["device0"][1] and bytes[2] == map_devices["device0"][2]:
         for device, data_device in map_devices.items():
+            print(f'{data_device} =?= {bytes[:3]}')
             if data_device == bytes[:3]:
                 device_signal = "dataDevice" + str(device[-1:]) # :-)
                 # getattr(self, device_signal).emit(bytes_formaited)
