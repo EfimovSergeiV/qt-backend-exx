@@ -236,6 +236,26 @@ Item {
         function onAllData(value){
             allData.text = value
         }
+
+        function onDataDevice0(value){
+            dataDevice0.text = value
+        }
+
+        function onDataDevice1(value){
+            dataDevice1.text = value
+        }
+
+        function onDataDevice2(value){
+            dataDevice2.text = value
+        }
+
+        function onDataDevice3(value){
+            dataDevice3.text = value
+        }
+
+        function onDataDevice4(value){
+            dataDevice4.text = value
+        }
     }
 
 }

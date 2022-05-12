@@ -8,13 +8,22 @@ from PySide2.QtCore import (
 from time import sleep
 
 
+map_devices = {
+    "device0": ["01", "01", "77"], # Устройство 1
+    "device1": ["01", "02", "77"], # Устройство 2
+    "device2": ["01", "04", "77"], # Устройство 3
+    "device3": ["01", "07", "77"], # Устройство 4
+    "device4": ["01", "08", "77"], # Устройство 5
+}
+
+
 class WatchPort(QObject):
     #Список данных COM порта:
 
     com_signal = Signal(str)
     close_connect = Signal()
 
-    com_lists = [
+    com_data_lists = [
         '0101771900000000006eff0d0a',
         '0102771900000000006dff0d0a',
         '0104771900000000006bff0d0a',
@@ -33,13 +42,11 @@ class WatchPort(QObject):
 
     def com_emulator(self):
         #Эмуляция порта COM:
-        for com in self.com_lists:
-            print(com)
+        for data in self.com_data_lists:
+            print(data)
             sleep(0.5)
-            self.com_signal.emit(com)
+            self.com_signal.emit(data)
         self.close_connect.emit()
-
-
 
 
 
@@ -50,13 +57,27 @@ class Controller(QObject):
 
     # Signals
     allData = Signal(str)
+    dataDevice0 = Signal(str)
+    dataDevice1 = Signal(str)
+    dataDevice2 = Signal(str)
+    dataDevice3 = Signal(str)
+    dataDevice4 = Signal(str)
 
 
     def com_data_handler(self, data):
         bytes = [data[i:i+2] for i in range(0, len(data), 2)]
-        self.allData.emit(
-            f'{bytes[0]} {bytes[1]} {bytes[2]} {bytes[3]} {bytes[4]} {bytes[5]} {bytes[6]} {bytes[7]} {bytes[8]} {bytes[9]} {bytes[10]} {bytes[11]} {bytes[12]}'
-            )
+        bytes_formaited = f'{bytes[0]} {bytes[1]} {bytes[2]} {bytes[3]} {bytes[4]} {bytes[5]} {bytes[6]} {bytes[7]} {bytes[8]} {bytes[9]} {bytes[10]} {bytes[11]} {bytes[12]}'
+        
+        self.allData.emit(bytes_formaited)
+
+        # Отображаем данные по каждому устройству:
+        # if bytes[0] == map_devices["device0"][0] and bytes[1] == map_devices["device0"][1] and bytes[2] == map_devices["device0"][2]:
+        for device, data_device in map_devices.items():
+            if data_device == bytes[:3]:
+                device_signal = "dataDevice" + str(device[-1:]) # :-)
+                # getattr(self, device_signal).emit(bytes_formaited)
+                self.__getattribute__(device_signal).emit(bytes_formaited)
+
 
     @Slot()
     def run(self):
