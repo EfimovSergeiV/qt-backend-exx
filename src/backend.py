@@ -9,16 +9,17 @@ from time import sleep
 
 
 map_devices = {
-    "device0": ["01", "01", "77"], # Устройство 1
-    "device1": ["01", "02", "77"], # Устройство 2
-    "device2": ["01", "04", "77"], # Устройство 3
-    "device3": ["01", "07", "01"], # Устройство 4
-    "device4": ["01", "0e", "77"], # Устройство 5
+    "0177": "Device0", # Устройство 1
+    "0277": "Device1", # Устройство 2
+    "0477": "Device2", # Устройство 3
+    "0701": "Device3", # Устройство 4
+    "0e77": "Device4", # Устройство 5
+    "0677": "Device5", # Устройство 5 DialControl
 }
 
 
 class WatchPort(QObject):
-    #Список данных COM порта:
+    """ Список данных COM порта: """
 
     com_signal = Signal(str)
     close_connect = Signal()
@@ -37,14 +38,20 @@ class WatchPort(QObject):
         '010f7719000000000060ff0d0a',
         '0110771900000000007fff0d0a',
         '0111771900000000007eff0d0a',
-        '01067719000000000069ff0d0a',        
+        # Data for DialControl
+        '01067719010200000069ff0d0a',
+        '01067719030200000069ff0d0a',
+        '01067719050200000069ff0d0a',
+        '01067719070200000069ff0d0a',
+        '01067719080200000069ff0d0a',
+        '01067719090200000069ff0d0a',
+        '01067719000020000069ff0d0a',
     ]
 
     def com_emulator(self):
         #Эмуляция порта COM:
         for data in self.com_data_lists:
-            print(data)
-            sleep(0.5)
+            sleep(1)
             self.com_signal.emit(data)
         self.close_connect.emit()
 
@@ -56,38 +63,42 @@ class Controller(QObject):
         QObject.__init__(self)
 
     # Signals
-    allData = Signal(str)
-    dataDevice0 = Signal(str)
-    dataDevice1 = Signal(str)
-    dataDevice2 = Signal(str)
-    dataDevice3 = Signal(str)
-    dataDevice4 = Signal(str)
+    signalData = Signal(str)
+    signalDevice0 = Signal(str)
+    signalDevice1 = Signal(str)
+    signalDevice2 = Signal(str)
+    signalDevice3 = Signal(str)
+    signalDevice4 = Signal(str)
+    signalDevice5 = Signal(int)
 
 
     def com_data_handler(self, data):
         bytes = [data[i:i+2] for i in range(0, len(data), 2)]
         bytes_formaited = f'{bytes[0]} {bytes[1]} {bytes[2]} {bytes[3]} {bytes[4]} {bytes[5]} {bytes[6]} {bytes[7]} {bytes[8]} {bytes[9]} {bytes[10]} {bytes[11]} {bytes[12]}'
         
-        self.allData.emit(bytes_formaited)
+        self.signalData.emit(bytes_formaited)
 
-        # Отображаем данные по каждому устройству:
-        # if bytes[0] == map_devices["device0"][0] and bytes[1] == map_devices["device0"][1] and bytes[2] == map_devices["device0"][2]:
-        for device, data_device in map_devices.items():
-            print(f'{data_device} =?= {bytes[:3]}')
-            if data_device == bytes[:3]:
-                device_signal = "dataDevice" + str(device[-1:]) # :-)
-                # getattr(self, device_signal).emit(bytes_formaited)
-                self.__getattribute__(device_signal).emit(bytes_formaited)
+        try:
+            device = map_devices[bytes[1] + bytes[2]]
+
+            # Если 3 байта не равны нулю, то отправляем значение
+            if bytes[5] != '00':
+                bytes_formaited = int(bytes[4] + bytes[5], 16) / 5
+            
+            getattr(self, "signal" + str(device)).emit(bytes_formaited)
+        except KeyError:
+            print('Неизвестное устройство')
 
 
     @Slot()
     def run(self):
+        """ Запуск потока """
         self.thread = QThread()
         self.watch_port = WatchPort()
         self.watch_port.moveToThread(self.thread)
 
         self.thread.started.connect(self.watch_port.com_emulator)
-
+        self.watch_port.close_connect.connect(self.thread.quit)
         self.watch_port.com_signal.connect(self.com_data_handler)
 
         self.thread.start()

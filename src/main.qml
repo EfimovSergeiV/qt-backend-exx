@@ -4,8 +4,10 @@ import QtQuick.Controls 2.15
 
 Window {
     id: mainwindow
-    width: 640
+    width: 800
     height: 480
+    minimumWidth: 800
+    minimumHeight: 480
     visible: true
     title: qsTr("Backend logic example")
 
