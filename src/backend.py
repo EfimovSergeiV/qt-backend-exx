@@ -1,3 +1,4 @@
+from random import random
 from PySide2.QtCore import (
     QObject,
     QThread,
@@ -6,6 +7,7 @@ from PySide2.QtCore import (
     )
 
 from time import sleep
+from random import randint
 
 
 map_devices = {
@@ -24,6 +26,7 @@ class WatchPort(QObject):
     com_signal = Signal(str)
     close_connect = Signal()
 
+    count = 0
     com_data_lists = [
         '0101771900000000006eff0d0a',
         '01067719030200000069ff0d0a',
@@ -46,14 +49,19 @@ class WatchPort(QObject):
         '01067719090200000069ff0d0a',
         '01067719000020000069ff0d0a',
     ]
-
+    
     def com_emulator(self):
         #Эмуляция порта COM:
-        for data in self.com_data_lists:
-            sleep(1)
-            self.com_signal.emit(data)
-        self.close_connect.emit()
+        # for data in self.com_data_lists:
+        #     sleep(1)
+        #     self.com_signal.emit(data)
+        # self.close_connect.emit()
 
+        for data in range(1000):
+            sleep(1)
+            select = randint(0, len(self.com_data_lists)-1)
+            self.com_signal.emit(self.com_data_lists[select])
+        self.close_connect.emit()
 
 
 class Controller(QObject):
