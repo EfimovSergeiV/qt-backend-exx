@@ -137,7 +137,7 @@ Item {
         id: dialControl
         width: 200
         height: 192
-        anchors.verticalCenterOffset: -126
+        anchors.verticalCenterOffset: -71
         anchors.horizontalCenterOffset: 249
         x: 0
         y: 0
@@ -153,6 +153,7 @@ Item {
         text: qsTr("01 01 77 19 00 00 00 00 00 6e ff 0d 0a")
         font.pointSize: 9
         font.bold: true
+        onClicked: controller.front_btn_handler("01 01 77 19 00 00 00 00 00 6e ff 0d 0a")
     }
 
     Button {
@@ -164,6 +165,7 @@ Item {
         text: qsTr("01 02 77 19 00 00 00 00 00 6d ff 0d 0a")
         font.pointSize: 9
         font.bold: true
+        onClicked: controller.front_btn_handler("01 02 77 19 00 00 00 00 00 6d ff 0d 0a")
     }
 
     Button {
@@ -175,6 +177,7 @@ Item {
         text: qsTr("01 04 77 19 00 00 00 00 00 6b ff 0d 0a")
         font.pointSize: 9
         font.bold: true
+        onClicked: controller.front_btn_handler("01 04 77 19 00 00 00 00 00 6b ff 0d 0a")
     }
 
     Button {
@@ -186,6 +189,7 @@ Item {
         text: qsTr("01 04 77 19 00 00 00 00 00 69 ff 0d 0a")
         font.pointSize: 9
         font.bold: true
+        onClicked: controller.front_btn_handler("01 04 77 19 00 00 00 00 00 69 ff 0d 0a")
     }
 
     Button {
@@ -197,6 +201,7 @@ Item {
         text: qsTr("01 07 01 19 00 00 00 00 00 1e ff 0d 0a")
         font.pointSize: 9
         font.bold: true
+        onClicked: controller.front_btn_handler("01 07 01 19 00 00 00 00 00 1e ff 0d 0a")
     }
 
     Button {
@@ -208,6 +213,7 @@ Item {
         text: qsTr("01 08 01 19 00 00 00 00 00 11 ff 0d 0a")
         font.pointSize: 9
         font.bold: true
+        onClicked: controller.front_btn_handler("01 08 01 19 00 00 00 00 00 11 ff 0d 0a")
     }
 
     Label {
@@ -246,6 +252,41 @@ Item {
         onClicked: controller.run()
     }
 
+    Label {
+        id: label
+        x: 549
+        y: 261
+        width: 200
+        height: 18
+        text: qsTr("This is device5")
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        font.bold: true
+    }
+
+    SpinBox {
+        id: spinBox
+        from: 0
+        value: 0
+        stepSize: 50
+        to: 100 * 100
+        x: 515
+        y: 18
+        width: 142
+        height: 26
+    }
+
+    Button {
+        id: button
+        x: 669
+        y: 18
+        width: 123
+        height: 26
+        text: qsTr("SendToDev5")
+        onClicked: controller.dial_handler(spinBox.value)
+    }
+
+
     Connections {
         target: controller
 
@@ -276,18 +317,6 @@ Item {
         function onSignalDevice5(value){
             dialControl.value = value
         }
-    }
-
-    Label {
-        id: label
-        x: 549
-        y: 221
-        width: 200
-        height: 18
-        text: qsTr("This is device4")
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        font.bold: true
     }
 
 }
